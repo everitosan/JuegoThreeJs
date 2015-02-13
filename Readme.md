@@ -1,5 +1,7 @@
 #Juego de pelota
-* Chrome requerido para lanzar la aplicación automáticamente.
+* **npm** requerido para instalar dependencias.
+* **bower** requerido para instalar librerías (Jquery & ThreeJs).
+* **Chrome** requerido para lanzar la aplicación automáticamente.
 
 Para iniciar el juego:
 ```bash
