@@ -16,6 +16,14 @@ $(function(){
 		vidas 	= 5,
 		p1      = '';
 
+	var maxX = 150,
+			minY = -50,
+			maxY = 150,
+			maxZ = 150;
+
+	var espaciado,
+		posBloque;
+
 	var setUp = function() {
 		renderer = new THREE.WebGLRenderer();
 		scene = new THREE.Scene();
@@ -33,6 +41,8 @@ $(function(){
 		iniciaBarra();
 		iniciaBloques();
 		render();
+
+		console.log(scene.children);
 	};
 
 	var iniciaPelota = function() {
@@ -45,8 +55,7 @@ $(function(){
 	};
 
 	var iniciaBloques = function () {
-		var espaciado,
-			posBloque;
+		
 
 		espaciado = 300 / bloques.length ;
 
@@ -65,7 +74,7 @@ $(function(){
 				scene.add(Bloque);
 			}
 		}
-		console.log(scene.children);
+		console.log(scene.children[9].position.x);
 	};
 
 	var iniciaBarra = function () {
@@ -85,12 +94,42 @@ $(function(){
 	}
 
 	var moverPelota = function () {
-		var maxX = 150,
-			minY = -50,
-			maxY = 150,
-			maxZ = 150;
+		
 
 		Pelota.rotation.z -= 0.01;
+
+		rebote();
+		eliminaBloques();
+
+	};
+
+	var eliminaBloques = function (){
+		var i = scene.children.length;
+		if (i===3) {
+			//#epicWin 
+			alert('Epic Win!!');
+			render = '';
+		}
+		else {
+			for (i;i>3;i--) {
+				if ( (Pelota.position.x + 11) >= (scene.children[i-1].position.x - espaciado/2) && (Pelota.position.x + 11) <= (scene.children[i-1].position.x + espaciado/2) ) {
+					if( (Pelota.position.y + 11)  > (scene.children[i-1].position.y - 6) && (Pelota.position.y - 11)  < (scene.children[i-1].position.y + 6)  ) {
+						//console.log('Total'+i);
+						//console.log('sup'+scene.children[i-1].name);
+						//console.log('Primera'+ (Pelota.position.x + 10) + '>=' +  (scene.children[i-1].position.x - espaciado/2) +'&&'+ (Pelota.position.x + 10) +'<='+ (scene.children[i-1].position.x + espaciado/2));
+						//console.log('Segunda'+  (Pelota.position.y +10) +'>='+  (scene.children[i-1].position.y - 5));
+						Pelota.masy = !Pelota.masy;	
+						scene.remove(scene.children[i-1]);	
+					}
+				}
+			}
+		}
+		
+	};
+
+	var rebote = function(){
+
+		var velocidad = 1;
 
 		if (Pelota.position.x == maxX) {
 			Pelota.masx = false;
@@ -106,7 +145,6 @@ $(function(){
 			if (Pelota.position.x <= (Barra.position.x + 35 ) && Pelota.position.x >= (Barra.position.x - 35)) 
 			{
 				Pelota.masy = true;
-				scene.remove(scene.children[3]);
 			}
 			else if (vidas !==0){
 				vidas --;
@@ -122,16 +160,16 @@ $(function(){
 		}
 		*/
 		if(Pelota.masx) {
-			Pelota.position.x +=2;
+			Pelota.position.x += velocidad;
 		}
 		else {
-			Pelota.position.x -=2;
+			Pelota.position.x -= velocidad;
 		}
 		if (Pelota.masy) {
-			Pelota.position.y += 2;
+			Pelota.position.y += velocidad;
 		}
 		else {
-			Pelota.position.y -= 2;
+			Pelota.position.y -= velocidad;
 		}
 		/*
 		if (Pelota.masz) {
@@ -141,8 +179,8 @@ $(function(){
 			Pelota.position.z -= 1;
 		}
 		*/
-		
 
+		//console.log(Pelota.position.x +'-'+ maxX);
 	};
 
 	var render = function () {
