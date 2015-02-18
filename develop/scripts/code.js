@@ -12,9 +12,12 @@ $(function(){
 		Barra,
 		Pelota;
 	//variables para game
-	var bloques = [1, 1, 1, 1, 1, 1, 1, 1],
-		vidas 	= 5,
-		p1      = '';
+	var Game = {
+		bloques : [1, 1, 1, 1, 1, 1, 1, 1],
+		vidas 	: 5,
+		p1      : '',
+		lose 	: false
+	};
 
 	var maxX = 150,
 			minY = -50,
@@ -50,6 +53,7 @@ $(function(){
 		var materialPelota = new THREE.MeshBasicMaterial({color:0xAF17E6,wireframe: true});
 		Pelota = new THREE.Mesh(geomPelota, materialPelota);
 		Pelota.position.y -=50;
+		Pelota.velocidad = 1;
 		scene.add(Pelota);
 
 	};
@@ -57,10 +61,10 @@ $(function(){
 	var iniciaBloques = function () {
 		
 
-		espaciado = 300 / bloques.length ;
+		espaciado = 300 / Game.bloques.length ;
 
-		for (i = 0;i<bloques.length; i++) {
-			if(bloques[i] === 1) {
+		for (i = 0;i< Game.bloques.length; i++) {
+			if( Game.bloques[i] === 1) {
 				var geomBloque = new THREE.BoxGeometry(espaciado, 10, 10);
 				var materialBloque = new THREE.MeshNormalMaterial({wireframe: true});
 				Bloque = new THREE.Mesh(geomBloque, materialBloque);
@@ -97,8 +101,9 @@ $(function(){
 		
 
 		Pelota.rotation.z -= 0.01;
-
-		rebote();
+		if (!Game.lose) {
+			rebote();
+		}
 		eliminaBloques();
 
 	};
@@ -114,12 +119,10 @@ $(function(){
 			for (i;i>3;i--) {
 				if ( (Pelota.position.x + 11) >= (scene.children[i-1].position.x - espaciado/2) && (Pelota.position.x + 11) <= (scene.children[i-1].position.x + espaciado/2) ) {
 					if( (Pelota.position.y + 11)  > (scene.children[i-1].position.y - 6) && (Pelota.position.y - 11)  < (scene.children[i-1].position.y + 6)  ) {
-						//console.log('Total'+i);
-						//console.log('sup'+scene.children[i-1].name);
-						//console.log('Primera'+ (Pelota.position.x + 10) + '>=' +  (scene.children[i-1].position.x - espaciado/2) +'&&'+ (Pelota.position.x + 10) +'<='+ (scene.children[i-1].position.x + espaciado/2));
-						//console.log('Segunda'+  (Pelota.position.y +10) +'>='+  (scene.children[i-1].position.y - 5));
 						Pelota.masy = !Pelota.masy;	
+						Pelota.velocidad+=1;
 						scene.remove(scene.children[i-1]);	
+						console.log(Pelota.velocidad);
 					}
 				}
 			}
@@ -128,28 +131,26 @@ $(function(){
 	};
 
 	var rebote = function(){
-
-		var velocidad = 1;
-
-		if (Pelota.position.x == maxX) {
+		if (Pelota.position.x >= maxX) {
 			Pelota.masx = false;
 		}
-		else if (Pelota.position.x == (maxX*-1) ) {
+		else if (Pelota.position.x <= (maxX*-1) ) {
 			Pelota.masx = true;
 		}
-		if (Pelota.position.y == maxY) {
+		if (Pelota.position.y >= maxY) {
 			Pelota.masy = false;
 		}
-		else if (Pelota.position.y == minY) {
+		else if (Pelota.position.y <= minY) {
 
 			if (Pelota.position.x <= (Barra.position.x + 35 ) && Pelota.position.x >= (Barra.position.x - 35)) 
 			{
 				Pelota.masy = true;
 			}
-			else if (vidas !==0){
-				vidas --;
-
+			else {
+				Game.lose = true;
 			}
+			//else if (vidas !==0){
+				//vidas --;
 		}
 		/*		
 		if (Pelota.position.z == maxZ) {
@@ -160,16 +161,16 @@ $(function(){
 		}
 		*/
 		if(Pelota.masx) {
-			Pelota.position.x += velocidad;
+			Pelota.position.x += Pelota.velocidad;
 		}
 		else {
-			Pelota.position.x -= velocidad;
+			Pelota.position.x -= Pelota.velocidad;
 		}
 		if (Pelota.masy) {
-			Pelota.position.y += velocidad;
+			Pelota.position.y += Pelota.velocidad;
 		}
 		else {
-			Pelota.position.y -= velocidad;
+			Pelota.position.y -= Pelota.velocidad;
 		}
 		/*
 		if (Pelota.masz) {
@@ -185,9 +186,9 @@ $(function(){
 
 	var render = function () {
 		controls.update();
-		requestAnimationFrame(render);
 		renderer.render(scene, camera);
 		moverPelota();
+		requestAnimationFrame(render);
 	};
 
 	setUp();
