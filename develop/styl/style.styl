@@ -1,3 +1,44 @@
+@import 'normalize'
+
+
+@keyframes flash
+	0%
+		opacity 0
+	50% 
+		opacity 1
+	100% 
+		opacity 0
+
 body
 	margin 0
 	padding 0
+	width 100%
+	height 100%
+#wrapper
+	height 100%
+	width 100%
+	img
+		transition all ease-out 2s
+		position absolute
+	#arkanoid
+		transition all ease-out 2s
+		font-family 'Phosphate'
+		font-size 3.5em
+		color white
+		margin 0
+		padding 0
+		position absolute
+	#barra
+		left -100%
+		width 45%
+	#circulo
+		right -100%
+		width 30%
+#Start
+	transition all ease-out 2s
+	position absolute
+	margin-top 15em
+	display none
+	cursor pointer
+	-webkit-animation flash 2s infinite
+		
