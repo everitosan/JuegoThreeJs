@@ -55,6 +55,12 @@ module.exports = function(grunt) {
 				cwd: 'develop/img',
 				src: '*',
 				dest: 'exports/img'
+			},
+			media: {
+				expand: true,
+				cwd: 'develop/media',
+				src: '*',
+				dest: 'exports/media'
 			}
 		},
 		watch: {
