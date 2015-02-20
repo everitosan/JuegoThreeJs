@@ -5,7 +5,7 @@ var orbit = require('./orbitControls');
 $(function(){
 	
 
-	// **********************************************Código del Juego
+	// **********************************************  Código del Juego
 	orbit(THREE);
 	//variables para three
 	var renderer,
@@ -16,7 +16,7 @@ $(function(){
 		Pelota;
 	//variables para game
 	var Game = {
-		bloques : [1, 1, 1, 1, 1, 1, 1, 1],
+		bloques : 10, 
 		vidas 	: 5,
 		p1      : '',
 		lose 	: false
@@ -31,22 +31,27 @@ $(function(){
 
 	var audios = {
 		inicio : new Audio('media/Loop1.mp3'),
-		adiosBarra : new Audio('media/Balloon Pop.mp3')
+		adiosBarra : new Audio('media/bicycle_pump.mp3'),
+		cancion :  new Audio('media/LoveWar.mp3')
 	};
 
 	audios.inicio.loop=true;
 	audios.inicio.play();
 
 	var maxX = 150,
-			minY = -50,
-			maxY = 150,
-			maxZ = 150;
+		minY = -50,
+		maxY = 150,
+		maxZ = 150;
 
 	var espaciado,
 		posBloque;
 
 
 	var setUp = function() {
+		$('#wrapper').remove();
+		$('#Scores').css('top',0);
+		$('#LeftVidas').html(Game.vidas);
+
 		renderer = new THREE.WebGLRenderer();
 		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 10000);
@@ -56,6 +61,7 @@ $(function(){
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor( 0xffffff, 1);
+		renderer.domElement.id = "canvas";
 		$('body').append(renderer.domElement);
 
 		controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -63,16 +69,20 @@ $(function(){
 		iniciaBarra();
 		iniciaBloques();
 		render();
+
+		$('#canvas').animate({top:0},{duration:2000,easing:"swing"});
 	};
 
 	var iniciaPelota = function() {
 		var geomPelota = new THREE.SphereGeometry(10,10,10);
 		var materialTextura = new THREE.ImageUtils.loadTexture('../img/tri.jpg');
-		
+		materialTextura.wrapS=materialTextura.wrapT=THREE.RepeatWrapping;
+		materialTextura.repeat.set(2,1);
+
 		materialTextura.minFilter = THREE.NearestFilter;
 		materialTextura.magFilter = THREE.NearestFilter;
 
-		var materialPelota = new THREE.MeshBasicMaterial({color:0xAF17E6,wireframe: false, map:materialTextura, side:THREE.DoubleSide, combine: true});
+		var materialPelota = new THREE.MeshBasicMaterial({color:0xAF17E6,wireframe: false, map:materialTextura, side:THREE.DoubleSide});
 		Pelota = new THREE.Mesh(geomPelota, materialPelota);
 		Pelota.position.y -=50;
 		Pelota.velocidad = 1;
@@ -83,24 +93,23 @@ $(function(){
 	var iniciaBloques = function () {
 		
 
-		espaciado = 300 / Game.bloques.length ;
+		espaciado = 350 / Game.bloques ;
 
-		for (i = 0;i< Game.bloques.length; i++) {
-			if( Game.bloques[i] === 1) {
+		for (i = 0;i< Game.bloques; i++) {
+			
 				var geomBloque = new THREE.BoxGeometry(espaciado, 10, 10);
 				var materialBloque = new THREE.MeshNormalMaterial({wireframe: false});
 				Bloque = new THREE.Mesh(geomBloque, materialBloque);
 
-				posBloque = (i * espaciado) - 150;
+				posBloque = (i * espaciado) - (150+espaciado/2);
 				
 				Bloque.position.x = posBloque;
 				Bloque.position.y = 100;
 				Bloque.name = "Bloque"+i;
 
 				scene.add(Bloque);
-			}
+			
 		}
-		//console.log(scene.children[9].position.x);
 	};
 
 	var iniciaBarra = function () {
@@ -121,28 +130,45 @@ $(function(){
 
 	var moverPelota = function () {
 		
-
 		Pelota.rotation.z -= 0.01;
 		if (!Game.lose) {
 			rebote();
+			eliminaBloques();
 		}
-		eliminaBloques();
 
 	};
 
 	var eliminaBloques = function (){
 		var i = scene.children.length;
+		var PelotaX,
+			PelotaY;
+
+		if (Pelota.masx) {
+			PelotaX = Pelota.position.x + 10;
+		}
+		else {
+			PelotaX = Pelota.position.x - 10;
+		}
+
+		if (Pelota.masy) {
+			PelotaY = Pelota.position.y + 10;
+		}
+		else {
+			PelotaY = Pelota.position.y - 10;
+		}
+
 		if (i===3) {
-			//#epicWin 
-			alert('Epic Win!!');
-			render = '';
+			alerta('Epic Win!!', 'Salir', 'Jugar!');
+			Game.lose = true;
 		}
 		else {
 			for (i;i>3;i--) {
-				if ( (Pelota.position.x + 11) >= (scene.children[i-1].position.x - espaciado/2) && (Pelota.position.x + 11) <= (scene.children[i-1].position.x + espaciado/2) ) {
-					if( (Pelota.position.y + 11)  > (scene.children[i-1].position.y - 6) && (Pelota.position.y - 11)  < (scene.children[i-1].position.y + 6)  ) {
+				if ( PelotaX >= (scene.children[i-1].position.x - espaciado/2) && PelotaX <= (scene.children[i-1].position.x + espaciado/2) ) {
+					//console.log( (Pelota.position.y + 11)  +'>='+(scene.children[i-1].position.y - 6)+'&&'+(Pelota.position.y - 11)+'<='+(scene.children[i-1].position.y + 6));
+					if( PelotaY  >= (scene.children[i-1].position.y - 6) && PelotaY <= (scene.children[i-1].position.y + 6)  ) {
 						Pelota.masy = !Pelota.masy;	
-						Pelota.velocidad+=0.9;
+						Pelota.velocidad+=1;
+						$('#speed').html(Pelota.velocidad + 'x');
 						scene.remove(scene.children[i-1]);	
 						audios.adiosBarra.play();
 					}
@@ -150,6 +176,15 @@ $(function(){
 			}
 		}
 		
+	};
+
+	var reStart= function () {
+		Game.lose = false;
+		Pelota.position.x = 0;
+		Pelota.position.y = -50;
+		Barra.position.x = 0;
+		Pelota.masx = !Pelota.masx;
+		Pelota.masy = true;
 	};
 
 	var rebote = function(){
@@ -178,9 +213,15 @@ $(function(){
 			}
 			else {
 				Game.lose = true;
+				if (Game.vidas !==0) {
+					Game.vidas --;
+					$('#LeftVidas').html(Game.vidas);
+					setTimeout(reStart,3000);
+				}
+				else {
+					alerta('You Lose :( ', 'Salir', 'Jugar!');
+				}
 			}
-			//else if (vidas !==0){
-				//vidas --;
 		}
 		
 		if (Pelota.position.z >= maxZ) {
@@ -210,8 +251,6 @@ $(function(){
 			Pelota.position.z -= 1;
 		}
 		*/
-
-		//console.log(Pelota.position.x +'-'+ maxX);
 	};
 
 	var render = function () {
@@ -222,13 +261,20 @@ $(function(){
 	};
 
 	function StartTheGame () {
-		setTimeout(function(){DomElements.circuloDom.top('-190%')}, 100);
-		setTimeout(function(){DomElements.arka.top('-170%')},  300);
-		setTimeout(function(){DomElements.barraDom.top('-150%')}, 500);
-		setTimeout(function(){DomElements.botonStart.top('-190%')}, 600);
+
+		$(audios.inicio).animate({volume: 0}, 3600);
+		audios.cancion.play();
+		audios.cancion.volume = 0;
+		$(audios.cancion).animate({volume: 1}, 5500);
+
+
+		setTimeout(function(){DomElements.circuloDom.top('-190%'); }, 100);
+		setTimeout(function(){DomElements.arka.top('-170%'); },  300);
+		setTimeout(function(){DomElements.barraDom.top('-150%'); }, 500);
+		setTimeout(function(){DomElements.botonStart.top('-190%'); }, 600);
 		
 		setTimeout(setUp, 3600);
-	};
+	}
 
 
 	var elementoDom = function(elem) {
@@ -261,7 +307,7 @@ $(function(){
 
 		setTimeout(function(){
 			DomElements.barraDom.center('left', 'top');
-		},600);
+		},400);
 
 		setTimeout(function(){
 			DomElements.circuloDom.center('right', 'top');
@@ -273,9 +319,42 @@ $(function(){
 		},2500);
 
 		DomElements.botonStart.elem.on('click', StartTheGame);
+		$('body').on('click','#Salir',Salir );
+		$('body').on('click','#Jugar',Jugar );
+		$(document).on('keydown',KeyPressed);
+	}
+
+	function Salir () {
+		window.location.assign("https://github.com/everitosan/JuegoThreeJs");
+	}
+
+	function Jugar () {
+		$('#alerta').remove();
+		Game.vidas = 5;
+		Pelota.velocidad = 1;
+		iniciaBloques();
+		reStart();
+	}
+
+
+	function KeyPressed (event) {
+		if(event.keyCode === 13) {
+			StartTheGame();
+		}
+		else if (event.keyCode === 39 && Barra){ //derecha
+			Barra.position.x += 25;
+		}
+		else if (event.keyCode === 37&& Barra){ //izquierda
+			Barra.position.x -= 25;
+		}
+	}
+
+	function alerta (msg, btn1, btn2) {
+		var elementoAlerta = new elementoDom ( $('<div id="alerta" ><p>'+msg+'</p> <div class="btn" id="Salir" > '+btn1+' </div> <div class="btn" id="Jugar"> '+btn2+' </div> </div>') );
+		$('body').append(elementoAlerta.elem);
+		elementoAlerta.center('right','top');
 	}
 
 
 	animacionInicial();
-
 });
