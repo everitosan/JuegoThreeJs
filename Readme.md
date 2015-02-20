@@ -1,4 +1,4 @@
-#Juego de pelota
+#ARKANOID
 * **npm** requerido para instalar dependencias de compilación.
 * **bower** requerido para instalar librerías (Jquery & ThreeJs).
 * **Chrome** requerido para lanzar la aplicación automáticamente.
