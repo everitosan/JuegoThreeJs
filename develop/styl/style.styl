@@ -1,5 +1,6 @@
 @import 'normalize'
 @import 'colors'
+@import 'font'
 
 $baseFont = 16
 
@@ -51,18 +52,28 @@ body
 	transition all ease-out 2s
 	left 0
 	top -50%
-	text-align right
+	text-align center
 	width 100%
 	z-index 1
+	color white
 	p
-		color white
+		margin 0
 		display inline-block
 		vertical-align top
+	span
+		cursor pointer
 	.inline
 		display inline-block
+		padding .5em
 		vertical-align top
 	.datos
-		margin 1em
+		margin 0 1em 
+.treinta
+	width 30%
+.livelost
+	color $red
+.hide
+	display none
 #canvas
 	position absolute
 	top 82%
@@ -85,5 +96,5 @@ body
 		vertical-align top
 		width 50%
 		&:hover
-			background $pink - 20
+			background $pink - 60
 		

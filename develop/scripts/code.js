@@ -50,7 +50,11 @@ $(function(){
 	var setUp = function() {
 		$('#wrapper').remove();
 		$('#Scores').css('top',0);
-		$('#LeftVidas').html(Game.vidas);
+
+		for (var j=0; j<Game.vidas; j++) {
+			$('#LeftVidas').append( $('<span class="icon-circle-full"></span>') );
+		}
+
 
 		renderer = new THREE.WebGLRenderer();
 		scene = new THREE.Scene();
@@ -185,6 +189,7 @@ $(function(){
 		Barra.position.x = 0;
 		Pelota.masx = !Pelota.masx;
 		Pelota.masy = true;
+
 	};
 
 	var rebote = function(){
@@ -215,7 +220,8 @@ $(function(){
 				Game.lose = true;
 				if (Game.vidas !==0) {
 					Game.vidas --;
-					$('#LeftVidas').html(Game.vidas);
+					$($('#LeftVidas').children()[0]).remove();
+					$('#LeftVidas').append($("<p class='icon-record livelost'></p>"));
 					setTimeout(reStart,3000);
 				}
 				else {
@@ -322,6 +328,26 @@ $(function(){
 		$('body').on('click','#Salir',Salir );
 		$('body').on('click','#Jugar',Jugar );
 		$(document).on('keydown',KeyPressed);
+		$('#controles').on('click', toggleAudio);
+	}
+
+	function toggleAudio(event) {
+		event.stopPropagation();
+
+		console.log(audios.cancion.volume);
+		if(audios.cancion.volume === 1) {
+			audios.cancion.volume = 0;
+			$('.icon-soundoff').removeClass('hide');
+			$('.icon-sound-alt').addClass('hide');
+		}
+		else {
+			audios.cancion.volume = 1;
+			$('.icon-soundoff').addClass('hide');
+			$('.icon-sound-alt').removeClass('hide');
+		}
+
+
+		
 	}
 
 	function Salir () {
@@ -333,6 +359,10 @@ $(function(){
 		Game.vidas = 5;
 		Pelota.velocidad = 1;
 		iniciaBloques();
+		$('#LeftVidas').html('');
+		for (var j=0; j<Game.vidas; j++) {
+			$('#LeftVidas').append( $('<span class="icon-circle-full"></span>') );
+		}
 		reStart();
 	}
 

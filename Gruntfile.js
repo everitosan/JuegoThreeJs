@@ -61,6 +61,12 @@ module.exports = function(grunt) {
 				cwd: 'develop/media',
 				src: '*',
 				dest: 'exports/media'
+			},
+			font: {
+				expand: true,
+				cwd: 'develop/fonts',
+				src: '*',
+				dest: 'exports/fonts'
 			}
 		},
 		watch: {

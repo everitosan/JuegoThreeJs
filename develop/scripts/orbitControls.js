@@ -26,7 +26,7 @@ THREE.OrbitControls = function ( object, domElement, localElement ) {
  
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-	this.localElement = ( localElement !== undefined ) ? localElement : document;
+	this.localElement = ( localElement !== undefined ) ? localElement : document.getElementById('canvas');
  
 	// API
  
