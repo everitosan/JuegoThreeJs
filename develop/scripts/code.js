@@ -165,7 +165,7 @@ $(function(){
 		$('canvas').mousemove(mueveBarra);
 	};
 
-	function mueveBarra() {
+	function mueveBarra(event) {
 		Barra.position.x = 0.5 * ((event.pageX) - (window.innerWidth / 2));
 		Barra.position.z = 0.5 * ((event.pageY) - (window.innerHeight / 2));
 	}
